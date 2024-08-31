@@ -22,12 +22,43 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hello = hello;
 const dotenv = __importStar(require("dotenv"));
+const axios_1 = __importDefault(require("axios"));
 dotenv.config();
 console.log(process.env.CLIENT_ID);
-const world = 'world';
-function hello(who = world) {
-    return `Hello 12345 ${who}! `;
+const clientID = process.env.CLIENT_ID;
+const clientSecret = process.env.CLIENT_SECRET;
+// Function to get the access token
+function getAccessToken() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const credentials = Buffer.from(`${clientID}:${clientSecret}`).toString("base64");
+        try {
+            const response = yield axios_1.default.post("https://us.battle.net/oauth/token", "grant_type=client_credentials", {
+                headers: {
+                    Authorization: `Basic ${credentials}`,
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+            });
+            console.log("we're so in");
+            return response.data.access_token;
+        }
+        catch (error) {
+            console.error("Error getting access token:", error);
+            return null;
+        }
+    });
 }
+getAccessToken();
